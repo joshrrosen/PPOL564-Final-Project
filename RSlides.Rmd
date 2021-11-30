@@ -1,0 +1,86 @@
+---
+title: "Clever Title"
+author: Josh(ua) Rosen
+date: December 1st, 2021
+output: revealjs::revealjs_presentation
+
+---
+
+# The Problem
+
+## problem 1: History
+
+- What is happening
+- Why now (despite seeming decrease)
+
+
+![](D:/Pictures/fatal_by_year.PNG)
+
+## Problem 2 slide
+
+- What this paper is about 
+
+![](D:/Downloads/total_test_plot.png)
+
+## Problem 3
+![](D:/Downloads/adjust_test_plot.png)
+
+# Methods/Approaches Considered 
+
+## M/A C: 1
+
+- Considered aggregating local data (most cities have their own systems)
+- Considered New Zealand's data (pretty extensive), but wanted to focus on US (distinct laws, infrastructure/planning, car culture that likely contribute to the problem)
+
+# Methods/Tools Used: 1 (data)
+
+- NHTSA FARS 
+- Data goes back to 1975
+- Primary analysis will be on 2019 data
+- Every variable imaginable (# of passangers, weather, light, road, car, ETC!)
+
+## Methods/tools used: 2 (Viz)
+
+- Viz (show some Viz)
+- Used to explore priors. It's way more interesting if we counter some (like urban vs. rural), but mostly it's what we'd expect (more on this in final slide)
+
+## Methods/tools used: 3 (models)
+
+- Classification
+- want to know what combination of events helps us to predict that an injury type will be a fatality
+- Models:
+  - Naive Bayes
+  - KNN
+  - Decision Tree
+  - Random forest
+  - Logit
+  - Gradient Boosting
+  - SVM
+- Last two haven't run (it takes too long)
+
+# Preliminary Results: 1 (model output)
+
+- Current best model / parameters:
+- current best score:
+- current ROC_AUC_Score:
+- Current Accuracy_Score: (idc abt this silly metric)
+
+## Prelim Results: 2 (model interpretation)
+
+- Show the tree plot
+- talk about how it's difficult to interpret with the dummy issue
+
+## Prelim Results: 2 (continued)
+
+- consider showing other interpretting plots (if will run)
+
+## Prelim Results: 3 (conclusion)
+
+- This is a highly predictive model that tells us essentially nothing interesting
+
+# Lessons Learned (so far)
+
+- bayes rate fallacy makes Viz pretty tough (show some)
+
+
+
