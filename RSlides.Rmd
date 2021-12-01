@@ -1,5 +1,5 @@
 ---
-title: "Clever Title"
+title: "A New Road to Safety: Predicting Traffic Fatalities in the United States"
 author: Josh(ua) Rosen
 date: December 1st, 2021
 output: revealjs::revealjs_presentation
@@ -8,79 +8,73 @@ output: revealjs::revealjs_presentation
 
 # The Problem
 
-## problem 1: History
+## History of the Problem
 
-- What is happening
-- Why now (despite seeming decrease)
+- Recent surge in traffic fatalities
 
 
-![](D:/Pictures/fatal_by_year.PNG)
+![](D:/Pictures/time_line.PNG)
 
-## Problem 2 slide
+## Goal of the Project
 
-- What this paper is about 
+- Develop a data-driven understanding of traffic fatalities in the United States
 
 ![](D:/Downloads/total_test_plot.png)
 
-## Problem 3
+## Goal of the Project
 ![](D:/Downloads/adjust_test_plot.png)
 
 # Methods/Approaches Considered 
 
-## M/A C: 1
+## Considerations
 
-- Considered aggregating local data (most cities have their own systems)
-- Considered New Zealand's data (pretty extensive), but wanted to focus on US (distinct laws, infrastructure/planning, car culture that likely contribute to the problem)
+- Number of different possible 'routes'
 
-# Methods/Tools Used: 1 (data)
+# Methods/Tools Used
 
-- NHTSA FARS 
-- Data goes back to 1975
-- Primary analysis will be on 2019 data
-- Every variable imaginable (# of passangers, weather, light, road, car, ETC!)
+## Method/Tools Used: The Data
+- National Highway Traffic Safety Administration's Fatality Analysis Reporting System (FARS)
+- 2019 data
 
-## Methods/tools used: 2 (Viz)
 
-- Viz (show some Viz)
-- Used to explore priors. It's way more interesting if we counter some (like urban vs. rural), but mostly it's what we'd expect (more on this in final slide)
+## Methods/Tools Used: Visualizations (and potential shortcomings)
 
-## Methods/tools used: 3 (models)
+![](D:/Pictures/weatherplot.PNG)
+
+## Methods/Tools Used: Modeling Approach
 
 - Classification
-- want to know what combination of events helps us to predict that an injury type will be a fatality
 - Models:
   - Naive Bayes
   - KNN
   - Decision Tree
   - Random forest
-  - Logit
+  - Logistic Regression
   - Gradient Boosting
-  - SVM
-- Last two haven't run (it takes too long)
+  - Support Vector Machine
 
-# Preliminary Results: 1 (model output)
+# Preliminary Results
 
-- Current best model / parameters:
-- current best score:
-- current ROC_AUC_Score:
-- Current Accuracy_Score: (idc abt this silly metric)
+## Preliminary Results: Model Output
 
-## Prelim Results: 2 (model interpretation)
+![](D:/Pictures/roc_training.PNG)
 
-- Show the tree plot
-- talk about how it's difficult to interpret with the dummy issue
+## Preliminary Results: Model Interpretation
 
-## Prelim Results: 2 (continued)
+![](D:/Pictures/tree_plot.PNG)
 
-- consider showing other interpretting plots (if will run)
+## Preliminary Results: Model Interpretation
 
-## Prelim Results: 3 (conclusion)
+![](D:/Pictures/depart_road.PNG)
 
-- This is a highly predictive model that tells us essentially nothing interesting
+## Preliminary Results: Conclusions
+
+- Predictive model, but does this challenge our priors?
+
 
 # Lessons Learned (so far)
 
-- bayes rate fallacy makes Viz pretty tough (show some)
+
 
 
 
