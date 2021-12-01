@@ -1,6 +1,6 @@
 ---
-title: "A New Road to Safety: Predicting Traffic Fatalities in the United States"
-author: Josh(ua) Rosen
+title: "Finding the Road to Safety: A Predictive Approach to Traffic Fatalities in the United States"
+author: Josh Rosen
 date: December 1st, 2021
 output: revealjs::revealjs_presentation
 
@@ -74,6 +74,7 @@ output: revealjs::revealjs_presentation
 
 # Lessons Learned (so far)
 
+- Other years
 
 
 
