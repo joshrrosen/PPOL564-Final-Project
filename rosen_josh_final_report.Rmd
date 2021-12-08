@@ -16,7 +16,9 @@ abstract: |
 
 bibliography: bibliography.bib
 output: rticles::asa_article
+fontsize: 12pt
 ---
+
 
 # Big Section
 
@@ -24,6 +26,15 @@ output: rticles::asa_article
 
 ### sub-er section
 
+# Introduction
 
+# Problem Statement and Background
 
+# Data 
+
+# Analysis
+
+# Results 
+
+# Discussion
 
