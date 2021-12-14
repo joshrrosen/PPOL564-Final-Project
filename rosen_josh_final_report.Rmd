@@ -1,5 +1,5 @@
 ---
-title: Finding the Road to Safety - A Predictive Approach to Traffic Fatalities in the United States
+title: Finding the Road to Safety$:$ A Predictive Approach to Traffic Fatalities in the United States
 
 # to produce blinded version set to 1
 blinded: 0
@@ -12,29 +12,185 @@ keywords:
 - Logistic regression, machine learning, urban policy
 
 abstract: |
-  come up with something later 
+  This paper attempts to produce a high-level description of the patterns correlated with traffic fatalities in the United States. Ultimately, a predictive modeling approach is utilized to assess ...  
 
 bibliography: bibliography.bib
 output: rticles::asa_article
 fontsize: 12pt
 ---
 
-
-# Big Section
-
-## Sub-section
-
-### sub-er section
-
 # Introduction
+
+Between January and June of 2021, the United States experienced the largest six-month increase in traffic fatalities ever recorded—up nearly 20 percent since 2020, and totaling over 20,000 deaths.[^1] Consequently, it has never been more pressing to establish a data-driven understanding of traffic fatalities in the United States. 
+
+As a result, the goal of this project is to formulate a high-level understanding of the aforementioned crisis. This broadly defined goal is operationalized into three primary components. First, the project aggregates widely available traffic fatality data into a single, unified source. Second, visualizations are utilized with various degrees of success to both prove and disprove common priors regarding the occurrence of traffic fatalities. Finally, this paper relies on predictive modeling to pin-point the variables highly correlated with deadly crashes. Ultimately, despite the construction of a highly predictive logistic regression model, this paper fails to both (a) formulate a novel hypothesis/outlook, and (b) disprove widely accepted assumptions. The paper therefore concludes with a discussion on 'next steps' to better achieve a policy-relevant understanding of traffic fatalities in the United States.
+[change this]
 
 # Problem Statement and Background
 
+\begin{center}
+```{r, echo=FALSE, out.width = "200px"}
+knitr::include_graphics("D:/Pictures/time_line.PNG")
+
+```
+\
+
+Figure X: Traffic Fatalities: 2004 to 2020
+
+\end{center}
+
 # Data 
+
+This paper makes use of the National Highway Traffic Safety Administration's (NHTSA) Fatality Analysis Reporting System (FARS) to underpin its core conclusions.[^2] As the name suggests, FARS represents a nationwide, public repository for traffic fatalities occurring between 1975 and 2019. Each yearly file contains 19 distinct sub-files categorizing different facets of a traffic fatality.[^3] Further, each respective sub-file utilized a distinct unit-of-analysis. Analysis is conducted on a single, merged CSV which has been constructed to contain the three most relevant sub-file from the 2019 records: the Accident Data File, the Vehicle Data File, and the Person Data File. All files were downloaded as CSVs and read into python using Pandas. 
+
+Merging the files was simple, but required an understanding of each data file's respective unit-of-analysis. Starting with the Accident file, each new observation represents a unique crash event, with the variable ST_CASE holding a unique crash identifier for each record. Next, the Vehicle data file adds records for each vehicle involved in a crash, as well as pre-crash classification variables. Each observation in the file therefore corresponds to a unique individual involved in the accident. The Accident and Vehicle files were therefore merged along the ST_CASE variable. Finally, the Person file contains variables for all pedestrians and drivers. Each observation thus corresponds to a unique individual, with only some resulting in a fatality. ST_CASE, the unique crash identifier, was utilized to merge the Person file with the Accident data file. Then, the ST_CASE and VEH_NO (a unique vehicle identifier) was utilized to merge the Person and Vehicle data files.    
+
+Notably, this process created overlapping ST_CASE and VEH_No observations, with the same crash and vehicle identifiers present in multiple rows corresponding to each person and vehicle involved in the accident. As a result, a simple summation of the fatality variable would result in a massive over-counting of total 2019 fatalities. Further, as the repositories name suggests, the system does not track total traffic \emph{accidents}, but only events that end in at least one \emph{fatality}. In other words, each observation pulled from the Accident data file contains a minimum of one fatality. This facet presented two challenges. First, the visualization component would be severely limited, with no ability to compare the relationship between total accidents and total fatalities. Second, the classification model could not be used to simply categorize which automobile accidents end in a fatality versus which accidents merely end in a few scratches.
+
+Once unified, the data revealed hundreds of possible predictor variables on factors such as: geography, time/date, the driver's previous accident(s), driver demographic variables, weather/light conditions, lane/system types, pre-crash critical events, vehicle make/model, and an individual's location within the automobile. To more efficiently select useful columns, an SQLite database was created and queried through python with variables were then manually selected. After transforming the array back to a Pandas Dataframe, this initial clean-through was saved as a new CSV representing the official unified source.
+
+In total, 88 predictor variables were isolated. Since the vast majority of variables were categorical, these fields were converted to dummy variables, with each possible outcome transformed into a single column holding a binary, 'yes' or 'no' distinction. For example, the original RUR_URBNAME variable held possible outcomes of "Rural," "Urban," "Unknown," and "Not Reported." However, after conversion to a dichotomous form, the variable was replaced by four columns indicating either a zero or a one. This process was also utilized to convert time/date values (hour, day, month), thus eliminating the need for time-series' capable models. Altogether, the unified dataframe contained 82220 rows and 2814 columns.
+
+Next, the dependent, outcome variable was selected. Since the data does not supply the total population of traffic accidents in a given year, the analysis instead shifted to identify the combination of events that strongly correlate with a "fatal" injury result. In other words, since the data contains each person involved in a given accident, the model aimed to predict which individual would be killed. The injury-type variable produces five possible outcomes: (1) died prior to the crash, (2) fatal injury, (3) injury, severity unknown, (4) no apparent injury, (5) possible injury. As with the predictor variables, the outcome variable was similarly transformed to a dummy variable to account for categorical values. Further, all but the fatal injury type outcome were excluded. Figure X displays the distribution of injury outcomes in the data prior to removing all values aside from fatalities. 
+
+\begin{center}
+```{r, echo=FALSE, out.width = "200px"}
+knitr::include_graphics("D:/Pictures/severityplot.PNG")
+
+```
+\
+
+Figure X: Distribution of Injury Severity
+
+\end{center}
 
 # Analysis
 
-# Results 
+Analysis was conducted through two methodological approaches. First, visualizations are utilized to create simplistic models testing popular assumptions regarding the occurrence of traffic fatalities. The logic here is clear: by presenting visualizations, this paper aims to present a visually informative depiction of the core problem. Nevertheless, these plots fail to indicate nuanced interpretations that counter prior assumptions. As will be discussed in later sections, these limitations largely spawn from gaps in the original data. Thus, predictive modeling is utilized as the core analytical framework.
+
+Second, supervised statistical learning was undertaken to describe the interactions strongly correlated with traffic fatalities. In more specific terms, statistical learning models aimed to predict which individual(s) involved in the accident were likely to be killed. Other tools were then utilized to find on which particular variables the model leaned to produce its prediction—thus lending insight into the variables most highly correlated with a desired outcome. Since the outcome variable assigned an observation to two possible binary values of no natural ordering—a fatality or not a fatality—the data necessitated using classification models rather than tools better suited for continuous observations. Five classification models were thus utilized at various tuning parameters: (1) Naive Bayes, (2) Logistic Regression, (3) K-Nearest Neighbors, (4) Decision Tree, (5) Random Forest.
+
+[describe how all models worked]. 
+
+The strength of logistic regression is it's ability to capture latent variables, thereby reflecting an unobserved continuous variable detailing the propensity of an individual outcome observation to equal one. The resulting effect, formed by an \emph{S-shaped} curve, ensures fitted predictions always lie between 0 and 1. Unlike OLS, logit coefficients are estimated through maximum likelihood where the coefficient estimates are selected to maximize the likelihood function. Finally, predictions are conducted through computing $P(Injury LevelFatality \ = \ 1)$ for each given predictor variable and accompanying level.[cite james et al]
+
+\begin{center}
+
+$P(Injury LevelFatality \ = \ 1) \ = \  \frac{e^{\beta_0\ + \ \beta_1X_{1i} \  + \ ... \ + \ \beta_nX_{n}}}{1 \ + \ e^{\beta_0\ + \ \beta_1X_{1i} \ + \ ... \ + \  \beta_nX_{n}}} $
+
+\end{center}
+
+[machine learning --> Go through splitting into test/train, scaling, removing NaNs. the pipeline, how all of that GridSearch stuff works, etc. The go through each model we used, why we used it/what it does. Then go through the tools we used for model interpretation. Will go over the model results in the result section]
+[split into two parts: what each model does, and how we implemented (like code and shit + parameters, etc)]
+
+Notably, neither methodological approaches, visualizations nor predictive modeling, reveal causal patterns in the data. Instead, visualizations perform simple aggregations, while the predictive models investigate which variables are highly correlated with traffic fatalities.  
+
+# Model Results 
+
+The primary method utilized to interpret model accuracy was the area under the curve (AUC) of the receiver operating characteristic (ROC) curve. This tool provides insight into multiple thresholds, and is therefore useful for comparing classification models. The ROC plots a comparison of the true positive rate and the false positive rate. The true positive rate (sensitivity) tracks the fraction of fatalities that are correctly identified. In contrast, the false positive rate (1-specificity) provides the fraction of non-fatalities that are incorrectly identified as fatalities. AUC, true to its title, is then used to calculate the total area under the curve. 
+
+Based on this selection, the logistic regression model achieved the highest predictive score—.9472—and was thus utilized for further analysis. As seen in figure X, the model predicts far above the 50-percent prediction threshold visualized by the dotted line through the plot.  
+
+\begin{center}
+```{r, echo=FALSE, out.width = "200px"}
+knitr::include_graphics("D:/Pictures/roc_training.PNG")
+```
+\
+
+Figure X: ROC: Training Data
+
+\end{center}
+
+Beyond predictive accuracy, it was essential to interpret (a) on which variables the model leaned most heavily to produce its prediction, and (b) in what direction did individual variables influence the prediction. Three tools were then utilized to achieve the aforementioned goals: (1) permutation feature importance, (2) partial dependence plots (with and without interaction), and (3) global surrogate models.
+
+Permutation feature importance measures the increase (or decrease) in the prediction's accuracy resulting from a permutation in the prediction variable. In other words, by shaking the variable, the tool disconnects a given feature from its true result [cite]. Variables with a high, positive vi coefficients are thus important for the model's predictive capacity. For example, the here the severe damage level of the damage extent variable produced a variable importance coefficient of .016006. Given an AUC score of .9472, excluding the severe damage variable level would lover prediction to roughly .931194. Roughly 800 of the nearly 3000 predictor variables reported positive importance coefficients. For a full list of variable importance, please visit this project's public repository. However, permutation feature importance fails to describe in what direction a given variable influences the prediction. In other words, while intuition may guide an understanding that severe damage is highly correlated with traffic fatalities, the results are less clear with the number of passengers in a motor vehicle, for example.
+
+Partial dependency plots and global surrogate models therefore provide necessary insight into model prediction. Starting with the former, partial dependency plots illustrate the marginal effect of a one or two variables on the predicted outcome [cite]. Figure X thus displays five noteworthy findings derived from this method. The first plot demonstrates how $P(Injury LevelFatality \ = \ 1)$ changes based on the position of an individual in the automobile. An important feature to keep in mind is that all the plots utilize dummy independent variables—thus reflecting how the prediction changes based on the variable's activation. Here we first see that an individual in the driver's seat of an automobile is less highly correlated with a fatality than an alternative seat. In other words, the model is less likely to predict that an individual will be killed if that individual was the driver of an automobile compared to his/her passenger(s). The second plot displays the effect of urban and rural environments on fatality prediction. Here, the model is less likely to predict a fatality result in an urban environment than a rural environment. While the first two results display a minor, negative relationship, the third finding produces a much stronger, positive prediction when activated. Specifically, the model finds that a vehicle that undergoes severe, disabling damage is strongly correlated with the occurrence of a traffic fatality. Next, BODY_TYP_x_80.0 is the data's method for classifying a motorcycle. Here the model finds motorcycles are slightly more correlated with traffic fatalities than other alternative vehicles. Finally, the model finds that interstates are slightly less correlated with deadly crashes than comparative systems. Four of the five findings contradict common intuition. As a result, the insight adds to the data-derived picture this story aims to tell regarding traffic fatalities in the United States.
+
+\begin{center}
+```{r, echo=FALSE, out.width = "400px"}
+knitr::include_graphics("D:/Pictures/pdp1.PNG")
+
+```
+\
+
+Figure X: Partial Dependency Plots
+
+\end{center}
+
+Critically, these plots fail to capture interaction between two variables. Below, one notable effect of interaction is thus displayed. First, Figure X displays the interaction between urban environments and pedestrian fatalities. Recall that the RUR_URBNAME_x_Urban variable is used to designate urban environments. Further, PER_TYPENAME_Pedestrian is utilized to denote when the individual killed is a pedestrian. Here, brighter colors distinguish when the model is more likely to predict a fatality. As a result, the plot demonstrates that the model is more likely to predict a pedestrian being killed in rural areas.
+
+\begin{center}
+```{r, echo=FALSE, out.width = "300px"}
+knitr::include_graphics("D:/Pictures/pedestrian1.PNG")
+
+```
+
+Figure X: Interaction Between Pedestrian Fatalities and Urban Environments
+
+\end{center}
+
+The final tool utilized for model interpretation is a global surrogate model. In simple terms, the global surrogate model takes the previously generated predictive probabilities for each observation and builds a second model on top. This second model then provides a interpretation via an approximation of the true model's prediction. Here the surrogate model takes the form of a decision tree regressor due to its easily interpretable features. Of note, however, the global surrogate model only achieves an $R \ ^2$ of $.62$ and thus fails to produce highly accurate results. In other words, the new model does not fit the predictions well. Nonetheless, with over $60$ percent of the variation explained by the model, it is possible to draw some conclusions. Figure X provides an additional visualization resource for some patterns explored here.
+
+\begin{center}
+```{r, echo=FALSE, out.width = "300px"}
+knitr::include_graphics("D:/Pictures/gsm.PNG")
+
+```
+
+Figure X: Global Surrogate Model
+
+\end{center}
+
+\begin{center}
+
+```{r, echo=FALSE, figures-side, fig.show="hold", out.width="90%"}
+
+knitr::include_graphics("D:/Downloads/fig (1).png")
+``` 
+
+Figure X: Damage Type and Pre-Crash Location
+
+\end{center}
+
+The surrogate model's narrative is clear and provides a few interesting and interpretable narratives from the data. First, the model creates clear distinction on the value HELM_USENAME_Not Applicable, thereby distinguishing pedestrians/automobiles from bicycles and motorcycles. Traveling down the tree to the left thus illustrates probabilities based on automobiles and pedestrian. The model then indicates that an automobile that departs the roadway prior to a crash, and has no passengers besides from the driver, is highly correlated with fatalities. In the most predictive case, the model predicts with $98.4$ percent accuracy that a single pedestrian struck by a vehicle will be killed. Worth noting: since this data does not include all total accidents, it is important to distinguish that this interpretation does not conclude $98$ percent of pedestrians will be killed. Interestingly, both the aforementioned cases involve number of individuals as a key predictive variable. As a result, the following section will discuss the relationship of total passengers and pedestrians further.
 
 # Discussion
 
+Before diving into the more interesting relationships found in the data, it is first necessary to discuss the limitations of visualizations. With the goal of this project to provide a data-driven understanding of traffic fatalities in the United States, visualizations understandably should provide useful findings, if not key insight. However, 
+
+This limitation takes the form of a 'near-base rate fallacy,' and is best explained through an example. Suppose an individual is asked whether it is more likely to see a fatality occur on a sunny day or a rainy day. It's reasonable for that individual to assume rainy due to substantial evidence that rain represents a more 'dangerous' condition [cite]. However, since there are likely three times as many sunny days, the vast majority of traffic fatalities occur on sunny days. While this problem is easily accounted for by statistical learning techniques, without proper documentation of hyper-localized weather patterns, this data provides no inherent ability to counter the issue. 
+
+
+\begin{center}
+```{r, echo=FALSE, out.width = "300px"}
+knitr::include_graphics("D:/Pictures/weatherplot.PNG")
+
+```
+
+Figure X: Fatalities by Weather Condition
+
+\end{center}
+
+The same fault occurs in other variables as well, with Figure X pulling a few notable cases. In all plots, it is likely that each spike correlates to the system with the most vehicle miles traveled. 
+
+\begin{center}
+```{r, echo=FALSE, out.width = "450px"}
+knitr::include_graphics("D:/Downloads/fig.png")
+
+```
+
+Figure X: Near-Base Rate Fallacy Demonstration
+
+\end{center}
+
+Next, it is necessary to discuss possible future steps for continuing this research.
+[go over 'the most prominent relationship found thus far' and then talk about future things]
+
+
+
+[^1]: “USDOT Releases New Data Showing That Road Fatalities Spiked in First Half of 2021,” U.S. Department of Transportation, published October 28, 2021, https://www.transportation.gov/briefing-room/usdot-releases-new-data-showing-road-fatalities-spiked-first-half-2021.
+
+[^2]: “Fatality Analysis Reporting System,” NHTSA, accessed October 27, 2021, https://www.nhtsa.gov/research-data/fatality-analysis-reporting-system-fars.
+
+[^3]: “Fatality Analysis Reporting System (FARS) Analytical User’s Manual, 1975-2019,” NHTSA, revised February 2021, https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813023. 
